@@ -2,8 +2,23 @@ const mongoose = require('mongoose');
 const crypto = require('crypto');
 
 const UserSchema = mongoose.Schema({
-    username: String,
-    email: String,
+    username: {
+        unique: true,
+        type: String
+    },
+    email: {
+        unique: true,
+        type: String
+    },
+    firstName: String,
+    lastName: String,
+    gender: String,
+    yearOfBirth: Number,
+    phone: String,
+    country: String,
+    city: String,
+    address: String,
+    postcode: Number,
     passwordHash: String,
     salt: String
 });

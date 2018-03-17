@@ -9,13 +9,15 @@ module.exports = function () {
             let username;
             let password;
 
+            console.log(req.body);
+            
             if (req.body.username && req.body.password) {
                 username = req.body.username;
                 password = req.body.password;
             }
 
             const user = await User.findOne({username});
-
+            
             if (!user) {
                 res.status(401).json({msg: "Пользователь не найдет"});
                 return;
@@ -28,9 +30,8 @@ module.exports = function () {
                     msg: "Вход выполнен",
                     user: {
                         id: user.id,
-                        email: user.email,
-                        username: user.username
-                    }, token: token
+                        token: token
+                    }
                 });
             } else {
                 res.status(401).json({msg: "Не верный пароль"});
@@ -52,7 +53,22 @@ module.exports = function () {
                     return;
                 }
 
-                await User.create(req.body);
+                const data = {
+                    username: req.body.username,
+                    email: req.body.email,
+                    password: req.body.password,
+                    firstName: '',
+                    lastName: '',
+                    gender: '',
+                    yearOfBirth: 0,
+                    phone: '',
+                    country: '',
+                    city: '',
+                    address: '',
+                    postcode: 0
+                };
+
+                await User.create(data);
                 res.status(201).send({msg: 'Аккаунт создан, теперь можете войти'});
             } catch (e) {
                 console.log(e);
