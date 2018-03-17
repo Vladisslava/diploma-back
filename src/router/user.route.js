@@ -12,6 +12,7 @@ module.exports = function () {
                     return;
                 }
 
+
                 const info = {
                     username: user.username,
                     email: user.email,
