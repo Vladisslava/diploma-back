@@ -12,7 +12,6 @@ module.exports = function () {
                     return;
                 }
 
-
                 const info = {
                     username: user.username,
                     email: user.email,
@@ -25,6 +24,7 @@ module.exports = function () {
                     city: user.city,
                     address: user.address,
                     postcode: +user.postcode,
+                    favoritesBox: user.favoritesBox
                 };
                 
                 res.status(200).send({msg: '', user: info})
@@ -52,7 +52,7 @@ module.exports = function () {
                     ([
                         'username', 'email', 'firstName', 'lastName',
                         'gender', 'yearOfBirth', 'phone', 'country',
-                        'city', 'address', 'postcode',
+                        'city', 'address', 'postcode', 'favoritesBox'
                     ].indexOf(key) > -1) && (data[key] = newUser[key]);
                 }
 

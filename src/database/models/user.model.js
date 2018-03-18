@@ -20,7 +20,8 @@ const UserSchema = mongoose.Schema({
     address: String,
     postcode: Number,
     passwordHash: String,
-    salt: String
+    salt: String,
+    favoritesBox: [],
 });
 
 UserSchema.virtual('password')

@@ -1,4 +1,5 @@
 const mongoose = require('mongoose');
+const mongoosePaginate = require('mongoose-paginate');
 
 const BoxSchema = mongoose.Schema({
     name: String,
@@ -9,5 +10,7 @@ const BoxSchema = mongoose.Schema({
     description: String,
     authorId: String
 });
+
+BoxSchema.plugin(mongoosePaginate);
 
 module.exports = mongoose.model('Box', BoxSchema);

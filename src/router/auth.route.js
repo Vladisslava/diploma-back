@@ -65,7 +65,8 @@ module.exports = function () {
                     country: '',
                     city: '',
                     address: '',
-                    postcode: 0
+                    postcode: 0,
+                    favoritesBox: []
                 };
 
                 await User.create(data);
