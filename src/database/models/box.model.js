@@ -4,11 +4,12 @@ const mongoosePaginate = require('mongoose-paginate');
 const BoxSchema = mongoose.Schema({
     name: String,
     dateEnd: Number,
+    dateDistribution: Number,
     isPrivate: Boolean,
     password: String,
     users: Array,
     description: String,
-    authorId: String
+    creator: String
 });
 
 BoxSchema.plugin(mongoosePaginate);

@@ -2,6 +2,9 @@ const router = require('express').Router();
 const jwt = require('jsonwebtoken');
 const config = require('config');
 const User = require('../database/models/user.model');
+const ActivationToken = require('../database/models/activation-token.model');
+const uuidv4 = require('uuid/v4');
+const {sendEmail} = require('../service/mailer');
 
 module.exports = function () {
     router
@@ -37,7 +40,6 @@ module.exports = function () {
                 res.status(401).json({msg: "Не верный пароль"});
             }
         })
-
         .post('/signup', async function (req, res) {
             try {
                 const userByLogin = await User.findOne({username: req.body.username});
@@ -65,18 +67,46 @@ module.exports = function () {
                     country: '',
                     city: '',
                     address: '',
+                    active: false,
                     postcode: 0,
                     favoritesBox: []
                 };
 
                 await User.create(data);
+
+                const activationToken = uuidv4();
+                await ActivationToken.create({
+                    username: req.body.username,
+                    token: activationToken,
+                    active: false
+                });
+
+                await sendEmail({
+                    from: 'antsiferovmaximv@gmail.com',
+                    to: req.body.email,
+                    subject: 'Код активации',
+                    text: 'Чтобы активировать аккаунт перейдите по ссылке - http://localhost:3010/api/activate/' + activationToken
+                });
+
                 res.status(201).send({msg: 'Аккаунт создан, теперь можете войти'});
             } catch (e) {
                 console.log(e);
 
                 res.status(400).send({msg: 'Error'});
             }
-        });
+        })
+        .get('/activate/:token', async function (req, res) {
+            const {username, token} = await ActivationToken.findOne({token: req.params.token});
+            if (username) {
+                await ActivationToken.update({token}, {active: true});
+                await User.update({username}, {active: true});
+
+                res.send('Аккаунт активирован');
+            } else {
+                res.send('Код не найден');
+            }
+        })
+    ;
 
     return router;
 };

@@ -21,6 +21,7 @@ const UserSchema = mongoose.Schema({
     postcode: Number,
     passwordHash: String,
     salt: String,
+    active: Boolean,
     favoritesBox: [],
 });
 

@@ -4,7 +4,8 @@
   "description": "API for diploma app",
   "main": "src/index.js",
   "scripts": {
-    "dev": "nodemon index.js"
+    "dev": "nodemon index.js",
+    "db": "docker run --rm --name diploma-db -e MONGO_INITDB_ROOT_USERNAME=maxim -e MONGO_INITDB_ROOT_PASSWORD=password -p 27017:27017 -v ${PWD}/data/db:/data/db mongo"
   },
   "engines": {
     "node": "8.9.3"
@@ -19,12 +20,14 @@
     "jsonwebtoken": "^8.1.1",
     "mongoose": "^5.0.7",
     "mongoose-paginate": "^5.0.3",
-    "morgan": "^1.9.0",
+    "morgan": "^1.9.1",
+    "nodemailer": "^4.7.0",
     "passport": "^0.4.0",
     "passport-jwt": "^3.0.1",
-    "passport-local": "^1.0.0"
+    "passport-local": "^1.0.0",
+    "uuid": "^3.3.2"
   },
   "devDependencies": {
-    "nodemon": "^1.15.1"
+    "nodemon": "^1.18.6"
   }
 }
