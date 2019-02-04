@@ -3,11 +3,11 @@ const mongoosePaginate = require('mongoose-paginate');
 
 const BoxSchema = mongoose.Schema({
     name: String,
-    dateEnd: Number,
-    dateDistribution: Number,
+    dateEnd: Date,
+    dateDistribution: Date,
     isPrivate: Boolean,
     password: String,
-    users: Array,
+    users: [{user: String, ward: String}],
     description: String,
     creator: String
 });
