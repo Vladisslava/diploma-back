@@ -83,8 +83,11 @@ api
     .use(bodyParser.json())
     .use(bodyParser.urlencoded({ extended: true }))
     .use(passport.initialize())
-    .use('/', routes)
-    .listen(config.api.port, () => {
+    .use('/', routes);
+
+setTimeout(() => {
+    api.listen(config.api.port, () => {
         console.log('Api starting in http://localhost:' + config.api.port);
     });
+}, 10000);
 

@@ -1,0 +1,20 @@
+version: "2"
+services:
+  backend:
+    build:
+      context: ./
+      dockerfile: Dockerfile
+    links:
+      - mongo
+    ports:
+      - 3010:3010
+      - 27017:27017
+    depends_on:
+      - mongo
+  mongo:
+    image: mongo
+    environment:
+      - MONGO_INITDB_ROOT_USERNAME=maxim
+      - MONGO_INITDB_ROOT_PASSWORD=password
+    volumes:
+      - ./data/db:/data/db
