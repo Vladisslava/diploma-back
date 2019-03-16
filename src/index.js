@@ -6,6 +6,8 @@ const passport = require('./auth/passport');
 const dbConnect = require('./database/mongodb');
 const logger = require('morgan');
 const moment = require('moment');
+const {sendEmail} = require('./service/mailer');
+const {FRONT_HOST} = require('./constants');
 
 function shuffle(array) {
     let currentIndex = array.length, temporaryValue, randomIndex;
@@ -28,6 +30,7 @@ const api = express();
 dbConnect();
 
 const Box = require('./database/models/box.model');
+const User = require('./database/models/user.model');
 
 function timezoneOffset() {
     return new Date().getTimezoneOffset() / 60
@@ -46,19 +49,27 @@ const getISONow = () => moment().startOf('day').subtract(timezoneOffset(), 'h').
         let prevUser = shuffleUsers[shuffleUsers.length - 1].user;
 
         for (let i = 0; i < shuffleUsers.length; i++) {
-            const user = shuffleUsers[i];
+            const userInBox = shuffleUsers[i];
             const newUser = {
-                _id: user._id,
-                user: user.user,
+                _id: userInBox._id,
+                user: userInBox.user,
                 ward: prevUser
             };
 
-            console.log(newUser);
             newUsers.push(newUser);
 
-            prevUser = user.user
+            const user = await User.findById(userInBox.user);
+
+            sendEmail({
+                from: 'antsiferovmaximv@gmail.com',
+                to: user.email,
+                subject: `Сегодня произошло распределения подарков в коробке <${box.name}>`,
+                text: `Можете перейти в коробку, чтобы узнать сабмиссива ${FRONT_HOST}home/boxperson/${box._id}`
+            });
+
+            prevUser = userInBox.user
         }
-        
+
         await Box.findOneAndUpdate({_id: box._id}, {$set: {users: newUsers}}, {new: false});
     }
 })();
@@ -89,5 +100,5 @@ setTimeout(() => {
     api.listen(config.api.port, () => {
         console.log('Api starting in http://localhost:' + config.api.port);
     });
-}, 10000);
+}, 2000);
 

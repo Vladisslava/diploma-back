@@ -13,6 +13,6 @@
     "saveUninitialized": true
   },
   "db": {
-    "url": "mongodb://maxim:password@mongo:27017/ps?authSource=admin"
+    "url": "mongodb://maxim:password@localhost:27017/ps?authSource=admin"
   }
 }
