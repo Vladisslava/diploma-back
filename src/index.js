@@ -26,7 +26,8 @@ function shuffle(array) {
 
 const routes = require('./router')(passport);
 const api = express();
-const port = process.env.PORT || config.api.port;
+const port = process.env.$PORT || config.api.port;
+console.log(process.env);
 
 dbConnect();
 
