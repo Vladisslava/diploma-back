@@ -4,6 +4,7 @@
   "description": "API for diploma app",
   "main": "src/index.js",
   "scripts": {
+    "start": "node index.js",
     "dev": "nodemon index.js",
     "db": "docker run --rm --name diploma-db -e MONGO_INITDB_ROOT_USERNAME=maxim -e MONGO_INITDB_ROOT_PASSWORD=password -p 27017:27017 -v ${PWD}/data/db:/data/db mongo"
   },

@@ -1,6 +1,6 @@
 const path = require('path');
 const express = require('express');
-const config = require('config');
+const config = require('./config/default');
 const bodyParser = require('body-parser');
 const passport = require('./auth/passport');
 const dbConnect = require('./database/mongodb');

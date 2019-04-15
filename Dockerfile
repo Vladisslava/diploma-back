@@ -5,6 +5,8 @@ WORKDIR /opt/devzone
 
 ADD . ./
 
-EXPOSE 3010
+RUN npm i
+
+EXPOSE 80
 
 CMD npm run dev
