@@ -4,7 +4,7 @@ const config = require('config');
 module.exports = function () {
     mongoose.Promise = global.Promise;
 
-    mongoose.connect(config.db.url)
+    mongoose.connect(config.db.url, { useNewUrlParser: true })
         .then(() => {console.log('Connection succesful');})
         .catch((err) => console.error(err));
 
