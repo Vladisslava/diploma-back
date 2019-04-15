@@ -26,6 +26,7 @@ function shuffle(array) {
 
 const routes = require('./router')(passport);
 const api = express();
+const port = process.env.PORT || config.api.port;
 
 dbConnect();
 
@@ -98,7 +99,7 @@ api
 
 setTimeout(() => {
     api.listen(config.api.port, () => {
-        console.log('Api starting in http://localhost:' + config.api.port);
+        console.log('Api starting in http://localhost:' + port);
     });
 }, 2000);
 
