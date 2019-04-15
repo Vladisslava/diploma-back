@@ -1,6 +1,6 @@
 {
   "api": {
-    "port": 80
+    "port": 3001
   },
   "jwt": {
     "secret": "secret"
