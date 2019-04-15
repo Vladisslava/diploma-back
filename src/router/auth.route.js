@@ -1,6 +1,6 @@
 const router = require('express').Router();
 const jwt = require('jsonwebtoken');
-const config = require('config');
+const config = require('../config/default.json');
 const User = require('../database/models/user.model');
 const ForgotCodeModel = require('../database/models/forgot-codes.model');
 const ActivationToken = require('../database/models/activation-token.model');
