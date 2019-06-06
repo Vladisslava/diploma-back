@@ -14,6 +14,6 @@
     "saveUninitialized": true
   },
   "db": {
-    "url": "mongodb://maxim:password@localhost:27017/ps?authSource=admin"
+    "url": "mongodb://vladisslava:password12345@ds159767.mlab.com:59767/vladisslava-diploma"
   }
 }
