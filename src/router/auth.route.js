@@ -94,7 +94,11 @@ module.exports = function () {
             } catch (e) {
                 console.log(e);
 
-                res.status(400).send({msg: 'Error'});
+                res.status(400).send({
+                    msg: 'Error',
+                    error: true,
+                    stacktrace: e,
+                });
             }
         })
         .put('/forgot', async function (req, res) {
