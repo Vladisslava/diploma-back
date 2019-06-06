@@ -42,7 +42,7 @@ module.exports = function () {
                 res.status(401).json({msg: "Не верный пароль"});
             }
         })
-        .post('/signup', async function (req, res) {
+        .post('/signup', async function (req, res) { // Регистрация
             try {
                 const userByLogin = await User.findOne({username: req.body.username});
                 const userByEmail = await User.findOne({email: req.body.email});

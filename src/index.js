@@ -24,6 +24,8 @@ function shuffle(array) {
     return array;
 }
 
+// mongodb://maxim:password@localhost:27017/ps?authSource=admin
+
 const routes = require('./router')(passport);
 const api = express();
 const port = process.env.PORT || config.api.port;
@@ -65,7 +67,7 @@ const getISONow = () => moment().startOf('day').subtract(timezoneOffset(), 'h').
                 from: 'antsiferovmaximv@gmail.com',
                 to: user.email,
                 subject: `Сегодня произошло распределения подарков в коробке <${box.name}>`,
-                text: `Можете перейти в коробку, чтобы узнать сабмиссива ${FRONT_HOST}home/boxperson/${box._id}`
+                text: `Можете перейти в коробку, чтобы узнать подопечного ${FRONT_HOST}home/boxperson/${box._id}`
             });
 
             prevUser = userInBox.user
@@ -88,12 +90,12 @@ api
     .use(function (req, res, next) {
         res.set('Access-Control-Allow-Origin', '*');
         res.set('Access-Control-Allow-Methods', '"GET,POST,PUT,DELETE');
+        res.set("Access-Control-Allow-Headers", "Content-Type, Access-Control-Allow-Headers, Authorization, X-Requested-With");
 
         next();
     })
-    .use(express.static(path.join(__dirname, 'public')))
     .use(bodyParser.json())
-    .use(bodyParser.urlencoded({ extended: true }))
+    .use(express.static(path.join(__dirname, 'public')))
     .use(passport.initialize())
     .use('/', routes);
 

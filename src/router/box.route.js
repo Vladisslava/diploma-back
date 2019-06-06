@@ -43,7 +43,12 @@ module.exports = function () {
         .get('/box/search', async function (req, res) {
             const {query, page} = req.query;
 
-            const boxes = await Box.paginate({name: new RegExp(query)}, {page, limit: 6});
+            const boxes = await Box.paginate(
+                {
+                    name: new RegExp(query, 'i')
+                },
+                {page, limit: 6}
+            );
 
             res.send(boxes);
         })
@@ -78,26 +83,67 @@ module.exports = function () {
             res.send({msg: '', boxes})
         })
         .get('/box/user/:id', async function (req, res) {
-            const boxes = await Box.paginate({users: {$elemMatch: {user: req.params.id}}}, {
+            const boxes = await Box.paginate({
+                users: {
+                    $elemMatch: {user: req.params.id}
+                }
+            }, {
                 page: req.query.page,
                 limit: 6
             });
 
             res.send({msg: 'User boxes', boxes})
         })
+        .get('/box/user/:id/search', async function (req, res) {
+            const {query, page} = req.query;
+            const user = await User.findById(req.params.id);
+
+            const boxes = await Box.paginate({
+                name: new RegExp(query, 'i'),
+                $or: [
+                    {
+                        users: {
+                            $elemMatch: {user: req.params.id}
+                        }
+                    },
+                    {
+                        creator: user.username,
+                    }
+                ],
+            }, {page, limit: 6});
+
+            res.send(boxes);
+        })
         .get('/box/favorite/:id', async function (req, res) {
             const user = await User.findById(req.params.id);
+            const {query = '', page} = req.query;
             const boxesId = user.favoritesBox;
 
-            const boxes = await Box.paginate({_id: {$in: boxesId}}, {page: req.query.page, limit: 6});
+            const boxes = await Box.paginate({
+                name: new RegExp(query, 'i'),
+                _id: {$in: boxesId}
+            }, {
+                page,
+                limit: 6
+            });
 
-            res.send({msg: 'favorite', boxes: boxes})
+            res.send(boxes)
         })
         .post('/box', async function (req, res) {
             try {
-                await Box.create({...req.body, users: []});
+                if (!req.body.name) {
+                    res.status(400).send({msg: 'Укажите название коробки'});
+                }
 
-                res.status(201).send({msg: 'Коробка создана'});
+                if (!req.body.creator) {
+                    res.status(500).send({msg: 'Ошибка'});
+                }
+
+                console.log(req.body);
+
+                const box = await Box.create({...req.body});
+
+                res.status(201).send({msg: 'Коробка создана', box});
             } catch (e) {
                 console.log(e);
 
