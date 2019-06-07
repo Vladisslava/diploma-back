@@ -83,12 +83,12 @@ module.exports = function () {
                     active: false
                 });
 
-                await sendEmail({
+                /*await sendEmail({
                     from: 'antsiferovmaximv@gmail.com',
                     to: req.body.email,
                     subject: 'Код активации',
                     text: `Чтобы активировать аккаунт перейдите по ссылке - ${FRONT_HOST}api/activate/${activationToken}`
-                });
+                });*/
 
                 res.status(201).send({msg: 'Аккаунт создан, теперь можете войти'});
             } catch (e) {
