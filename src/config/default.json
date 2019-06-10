@@ -2,7 +2,7 @@
   "api": {
     "port": 8080
   },
-  "front": "http://localhost:3000",
+  "front": "https://vladisslava.github.io",
   "jwt": {
     "secret": "secret"
   },

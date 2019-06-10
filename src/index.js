@@ -103,7 +103,7 @@ const getISONow = () => moment().startOf('day').subtract(timezoneOffset(), 'h').
 
 api
     .use(function (req, res, next) {
-        res.set('Access-Control-Allow-Origin', config.front); // https://vladisslava.github.io
+        res.set('Access-Control-Allow-Origin', config.front);
         res.set('Access-Control-Allow-Methods', '"GET,POST,PUT,DELETE');
         res.set("Access-Control-Allow-Headers", "Content-Type, Access-Control-Allow-Headers, Authorization, X-Requested-With");
 
