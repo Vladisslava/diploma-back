@@ -20,6 +20,7 @@ const UserSchema = mongoose.Schema({
     address: String,
     postcode: Number,
     passwordHash: String,
+    photo: String,
     salt: String,
     active: Boolean,
     messageToken: String,

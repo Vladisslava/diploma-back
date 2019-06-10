@@ -7,6 +7,7 @@ const passport = require('./auth/passport');
 const dbConnect = require('./database/mongodb');
 const logger = require('morgan');
 const moment = require('moment');
+const fileUpload = require('express-fileupload');
 const {sendEmail} = require('./service/mailer');
 const {FRONT_HOST} = require('./constants');
 
@@ -25,7 +26,6 @@ function shuffle(array) {
     return array;
 }
 
-// mongodb://maxim:password@localhost:27017/ps?authSource=admin
 // mongodb://maxim:password@localhost:27017/ps?authSource=admin
 
 const routes = require('./router')(passport);
@@ -119,7 +119,11 @@ api
         ].join(' ')
     }))
     .use(bodyParser.json())
-    .use(express.static(path.join(__dirname, 'public')))
+    .use(bodyParser.urlencoded({ extended: true }))
+    .use(fileUpload({
+        limits: { fileSize: 50 * 1024 * 1024 },
+    }))
+    .use(express.static(path.join(__dirname, '..', 'public')))
     .use(passport.initialize())
     .use('/', routes);
 

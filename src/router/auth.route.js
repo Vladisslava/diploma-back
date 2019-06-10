@@ -70,6 +70,7 @@ module.exports = function () {
                     gender: '',
                     yearOfBirth: 0,
                     phone: '',
+                    photo: '/avatar/img.png',
                     country: '',
                     city: '',
                     address: '',
