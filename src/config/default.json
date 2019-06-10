@@ -2,7 +2,7 @@
   "api": {
     "port": 8080
   },
-  "front": "http://192.168.8.100:3000/",
+  "front": "http://localhost:3000",
   "jwt": {
     "secret": "secret"
   },

@@ -22,6 +22,7 @@ const UserSchema = mongoose.Schema({
     passwordHash: String,
     salt: String,
     active: Boolean,
+    messageToken: String,
     favoritesBox: [],
 });
 

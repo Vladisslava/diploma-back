@@ -1,6 +1,9 @@
 const router = require('express').Router();
 const Box = require('../database/models/box.model');
 const User = require('../database/models/user.model');
+const request = require('request');
+const {sendEmail} = require('../service/mailer');
+const config = require('../config/default');
 
 const keys = [
     'username',
@@ -36,6 +39,81 @@ function copyObject(obj, keys) {
     }
 
     return newObject;
+}
+
+function shuffle(array) {
+    let currentIndex = array.length, temporaryValue, randomIndex;
+
+    while (0 !== currentIndex) {
+        randomIndex = Math.floor(Math.random() * currentIndex);
+        currentIndex -= 1;
+
+        temporaryValue = array[currentIndex];
+        array[currentIndex] = array[randomIndex];
+        array[randomIndex] = temporaryValue;
+    }
+
+    return array;
+}
+
+function timezoneOffset() {
+    return new Date().getTimezoneOffset() / 60
+}
+
+const getISONow = () => moment().startOf('day').subtract(timezoneOffset(), 'h').toISOString();
+
+async function distributionInBox(box) {
+    if (box.users.length === 0) return;
+
+    const newUsers = [];
+    const shuffleUsers = shuffle(box.users);
+    let prevUser = shuffleUsers[shuffleUsers.length - 1].user;
+
+    for (let i = 0; i < shuffleUsers.length; i++) {
+        const userInBox = shuffleUsers[i];
+        const newUser = {
+            _id: userInBox._id,
+            user: userInBox.user,
+            ward: prevUser
+        };
+
+        newUsers.push(newUser);
+
+        const user = await User.findById(userInBox.user);
+
+        if (user.messageToken) {
+            request({
+                method: 'POST',
+                uri: 'https://fcm.googleapis.com',
+                headers: {
+                    Authorization: 'key=AAAADRbQi1U:APA91bE1KgPbWdH-DBee1rgXf6e2-IvvmQJ1SrSIZa9FBKyO_smZPWdvEgel10VLZsi4e4jDk4_QsY_iwEXRKC1I8zr1pPmN_VsyaZ9M4KJ7D4wYtnFkUrkO5J7CIIJR8pTOEtc3Df0j'
+                },
+                postData: {
+                    mimeType: 'application/json',
+                    params: {
+                        "notification": {
+                            "title": "Surprise",
+                            "body": "Вы получили подопечного",
+                            "icon": "https://eralash.ru.rsz.io/sites/all/themes/eralash_v5/logo.png?width=40&height=40",
+                            "click_action": config.front
+                        },
+                        "to": user.messageToken
+                    }
+                }
+            });
+        }
+
+        sendEmail({
+            from: 'antsiferovmaximv@gmail.com',
+            to: user.email,
+            subject: `Сегодня произошло распределения подарков в коробке <${box.name}>`,
+            text: `Можете перейти в коробку, чтобы узнать подопечного ${config.front}/#/home/boxperson/${box._id}`
+        });
+
+        prevUser = userInBox.user
+    }
+
+    await Box.findOneAndUpdate({_id: box._id}, {$set: {users: newUsers}}, {new: false});
 }
 
 module.exports = function () {
@@ -128,6 +206,13 @@ module.exports = function () {
             });
 
             res.send(boxes)
+        })
+        .get('/box/distribution/:id', async function (req, res) {
+            const box = await Box.findById(req.params.id);
+
+            await distributionInBox(box);
+
+            return res.send('ok')
         })
         .post('/box', async function (req, res) {
             try {

@@ -1,5 +1,6 @@
 const path = require('path');
 const express = require('express');
+const request = require('request');
 const config = require('./config/default');
 const bodyParser = require('body-parser');
 const passport = require('./auth/passport');
@@ -64,6 +65,28 @@ const getISONow = () => moment().startOf('day').subtract(timezoneOffset(), 'h').
 
             const user = await User.findById(userInBox.user);
 
+            if (user.messageToken) {
+                request({
+                    method: 'POST',
+                    uri: 'https://fcm.googleapis.com',
+                    headers: {
+                        Authorization: 'key=AAAADRbQi1U:APA91bE1KgPbWdH-DBee1rgXf6e2-IvvmQJ1SrSIZa9FBKyO_smZPWdvEgel10VLZsi4e4jDk4_QsY_iwEXRKC1I8zr1pPmN_VsyaZ9M4KJ7D4wYtnFkUrkO5J7CIIJR8pTOEtc3Df0j'
+                    },
+                    postData: {
+                        mimeType: 'application/json',
+                        params: {
+                            "notification": {
+                                "title": "Surprise",
+                                "body": "Вы получили подопечного",
+                                "icon": "https://eralash.ru.rsz.io/sites/all/themes/eralash_v5/logo.png?width=40&height=40",
+                                "click_action": config.front
+                            },
+                            "to": user.messageToken
+                        }
+                    }
+                });
+            }
+
             sendEmail({
                 from: 'antsiferovmaximv@gmail.com',
                 to: user.email,
@@ -80,7 +103,7 @@ const getISONow = () => moment().startOf('day').subtract(timezoneOffset(), 'h').
 
 api
     .use(function (req, res, next) {
-        res.set('Access-Control-Allow-Origin', 'https://vladisslava.github.io');
+        res.set('Access-Control-Allow-Origin', config.front); // https://vladisslava.github.io
         res.set('Access-Control-Allow-Methods', '"GET,POST,PUT,DELETE');
         res.set("Access-Control-Allow-Headers", "Content-Type, Access-Control-Allow-Headers, Authorization, X-Requested-With");
 

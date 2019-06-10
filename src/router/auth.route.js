@@ -15,6 +15,7 @@ module.exports = function () {
         .post('/signin', async function (req, res) {
             let username;
             let password;
+            let messageToken = req.body.messageToken;
             
             if (req.body.username && req.body.password) {
                 username = req.body.username;
@@ -31,6 +32,9 @@ module.exports = function () {
             if (user.checkPassword(password)) {
                 const payload = {id: user.id};
                 const token = jwt.sign(payload, config.jwt.secret);
+
+                await User.findByIdAndUpdate(user.id, {$set: {messageToken}},  { new: false });
+
                 res.status(200).json({
                     msg: "Вход выполнен",
                     user: {
@@ -83,12 +87,12 @@ module.exports = function () {
                     active: false
                 });
 
-                /*await sendEmail({
+                await sendEmail({
                     from: 'antsiferovmaximv@gmail.com',
                     to: req.body.email,
                     subject: 'Код активации',
                     text: `Чтобы активировать аккаунт перейдите по ссылке - ${FRONT_HOST}api/activate/${activationToken}`
-                });*/
+                });
 
                 res.status(201).send({msg: 'Аккаунт создан, теперь можете войти'});
             } catch (e) {
