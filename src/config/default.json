@@ -2,7 +2,7 @@
   "api": {
     "port": 8080
   },
-  "front": "https://vladisslava.githuc.com",
+  "front": "https://vladisslava.github.io",
   "https": {
     "key": "/opt/certs/31.131.28.162.key",
     "cert": "/opt/certs/31.131.28.162.crt"

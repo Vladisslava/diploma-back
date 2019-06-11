@@ -10,7 +10,7 @@ module.exports = function () {
                 const user = await User.findById(req.params.id);
 
                 if (!user) {
-                    res.status(404).send({msg: 'Пользователь не найден'});
+                    res.status(404).send({msg: 'Користувача не знайдено'});
                     return;
                 }
 
@@ -34,7 +34,7 @@ module.exports = function () {
             } catch (e) {
                 console.log(e);
 
-                res.status(500).send({msg: 'Сервер временно не работает :('})
+                res.status(500).send({msg: 'Сервер тимчасово не працює :('})
             }
         })
         .put('/user/:id', async function (req, res) {
@@ -42,7 +42,7 @@ module.exports = function () {
                 let user = await User.findById(req.params.id);
 
                 if (!user) {
-                    res.status(404).send({msg: 'Пользователь не найден'});
+                    res.status(404).send({msg: 'Користувача не знайдено'});
                     return;
                 }
 
@@ -60,11 +60,11 @@ module.exports = function () {
                     ].indexOf(key) > -1) && (data[key] = newUser[key]);
                 }
 
-                res.status(200).send({msg: 'Информация обновленна', user: data});
+                res.status(200).send({msg: 'Інформація оновлена', user: data});
             } catch (e) {
                 console.log(e);
 
-                res.status(500).send({msg: 'Сервер временно не работает :('});
+                res.status(500).send({msg: 'Сервер тимчасово не працює :('});
             }
         })
         .post('/user/:id/photo/', async function (req, res) {

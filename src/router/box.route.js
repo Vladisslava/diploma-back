@@ -92,8 +92,8 @@ async function distributionInBox(box) {
                     mimeType: 'application/json',
                     params: {
                         "notification": {
-                            "title": "Surprise",
-                            "body": "Вы получили подопечного",
+                            "title": "Подаруй",
+                            "body": "Розподіл відбувся!",
                             "icon": "https://eralash.ru.rsz.io/sites/all/themes/eralash_v5/logo.png?width=40&height=40",
                             "click_action": config.front
                         },
@@ -104,10 +104,10 @@ async function distributionInBox(box) {
         }
 
         sendEmail({
-            from: 'antsiferovmaximv@gmail.com',
+            from: 'podarui.nastrii@gmail.com',
             to: user.email,
-            subject: `Сегодня произошло распределения подарков в коробке <${box.name}>`,
-            text: `Можете перейти в коробку, чтобы узнать подопечного ${config.front}/#/home/boxperson/${box._id}`
+            subject: `Сьогодні відбувся розподіл участників у події<${box.name}>`,
+            text: `Можете перейти у подію, щоб дізнатися дані отриманого участника ${FRONT_HOST}/home/boxperson/${box._id}`
         });
 
         prevUser = userInBox.user
@@ -218,7 +218,7 @@ module.exports = function () {
             const box = await Box.findById(req.params.id);
 
             if (!box) {
-                return res.status(404).send({error: true, msg: 'Коробка не найдена'})
+                return res.status(404).send({error: true, msg: 'Подія не знайдена'})
             }
 
             await Box.findByIdAndUpdate(req.params.id, {$set: req.body}, {new: false});
@@ -229,23 +229,23 @@ module.exports = function () {
         .delete('/box/:id', async function (req, res) {
             await Box.findByIdAndRemove(req.params.id);
 
-            res.send({msg: 'Коробка удалена'})
+            res.send({msg: 'Подія видалена'})
         })
         .post('/box', async function (req, res) {
             try {
                 if (!req.body.name) {
-                    res.status(400).send({msg: 'Укажите название коробки'});
+                    res.status(400).send({msg: 'Вкажіть назву події'});
                 }
 
                 if (!req.body.creator) {
-                    res.status(500).send({msg: 'Ошибка'});
+                    res.status(500).send({msg: 'Помилка'});
                 }
 
                 const box = await Box.create({...req.body});
 
-                res.status(201).send({msg: 'Коробка создана', box});
+                res.status(201).send({msg: 'Подія створена', box});
             } catch (e) {
-                res.status(500).send({msg: 'Коробка не создана'});
+                res.status(500).send({msg: 'Подія не створена'});
             }
         })
         .post('/box/join', async function (req, res) {
@@ -254,22 +254,22 @@ module.exports = function () {
             const box = await Box.findById(boxId);
 
             if (!box)
-                return res.send({msg: 'Коробка не найдена', isJoin: false});
+                return res.send({msg: 'Подія не знайдена', isJoin: false});
 
             if (box.isPrivate && box.password !== password)
-                return res.send({msg: 'Не верный пароль', isJoin: false});
+                return res.send({msg: 'Невірний пароль', isJoin: false});
 
             const user = await User.findById(userId);
 
             for (let key of keys)
                 if (!user[key])
                     return res.status(403).send({
-                        msg: 'Заполните всю инофрмацию о себе'
+                        msg: 'Заповніть всю інформацію про себе'
                     });
 
             if (Date.now() > new Date(box.dateDistribution).getTime())
                 return res.status(401).send({
-                    msg: 'Извините, но прошло время распределения'
+                    msg: 'Вибачте, але минув час розподілу'
                 });
 
             const users = box.users;
@@ -279,7 +279,7 @@ module.exports = function () {
                 users.push({user: userId, ward: null});
             }
 
-            msg = 'Вы вступили в коробку';
+            msg = 'Вы берете участь у події';
 
             await Box.findByIdAndUpdate(boxId, {$set: {users}}, {new: false});
 
@@ -291,12 +291,12 @@ module.exports = function () {
             const box = await Box.findById(boxId);
 
             if (!box) {
-                res.send({msg: 'Коробка не найдена', isJoin: false});
+                res.send({msg: 'Подія не знайдена', isJoin: false});
                 return;
             }
 
             if (box.isPrivate && box.password !== password) {
-                res.send({msg: 'Не верный пароль', isJoin: false});
+                res.send({msg: 'Невірний пароль', isJoin: false});
                 return;
             }
 
@@ -305,7 +305,7 @@ module.exports = function () {
             let msg;
 
             users.splice(userIndex, 1);
-            msg = 'Вы вышли из коробки';
+            msg = 'Вы покинули подію';
 
             await Box.findByIdAndUpdate(boxId, {$set: {users}}, {new: false});
 
@@ -326,6 +326,6 @@ module.exports = function () {
 
             await User.findByIdAndUpdate(userId, {$set: {favoritesBox}}, {new: false});
 
-            res.send({msg: 'Фаворит выбран', favoritesBox});
+            res.send({msg: 'Додано в обране', favoritesBox});
         })
 };

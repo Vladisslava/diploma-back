@@ -78,8 +78,8 @@ const getISONow = () => moment().startOf('day').subtract(timezoneOffset(), 'h').
                         mimeType: 'application/json',
                         params: {
                             "notification": {
-                                "title": "Surprise",
-                                "body": "Вы получили подопечного",
+                                "title": "Подаруй",
+                                "body": "Розподіл відбувся!",
                                 "icon": "https://eralash.ru.rsz.io/sites/all/themes/eralash_v5/logo.png?width=40&height=40",
                                 "click_action": config.front
                             },
@@ -90,10 +90,10 @@ const getISONow = () => moment().startOf('day').subtract(timezoneOffset(), 'h').
             }
 
             sendEmail({
-                from: 'antsiferovmaximv@gmail.com',
+                from: 'podarui.nastrii@gmail.com',
                 to: user.email,
-                subject: `Сегодня произошло распределения подарков в коробке <${box.name}>`,
-                text: `Можете перейти в коробку, чтобы узнать подопечного ${FRONT_HOST}/home/boxperson/${box._id}`
+                subject: `Сьогодні відбувся розподіл участників у події<${box.name}>`,
+                text: `Можете перейти у подію, щоб дізнатися дані отриманого участника ${FRONT_HOST}/home/boxperson/${box._id}`
             });
 
             prevUser = userInBox.user

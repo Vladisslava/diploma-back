@@ -25,7 +25,7 @@ module.exports = function () {
             const user = await User.findOne({username});
             
             if (!user) {
-                res.status(401).json({msg: "Пользователь не найдет"});
+                res.status(401).json({msg: "Користувача не знайдено!"});
                 return;
             }
 
@@ -36,14 +36,14 @@ module.exports = function () {
                 await User.findByIdAndUpdate(user.id, {$set: {messageToken}},  { new: false });
 
                 res.status(200).json({
-                    msg: "Вход выполнен",
+                    msg: "Вхід виконано!",
                     user: {
                         id: user.id,
                         token: token
                     }
                 });
             } else {
-                res.status(401).json({msg: "Не верный пароль"});
+                res.status(401).json({msg: "Невірний пароль!"});
             }
         })
         .post('/signup', async function (req, res) { // Регистрация
@@ -52,12 +52,12 @@ module.exports = function () {
                 const userByEmail = await User.findOne({email: req.body.email});
 
                 if (userByLogin !== null) {
-                    res.status(400).send({msg: 'Логин занят, попробуйте другой'});
+                    res.status(400).send({msg: 'Логін зайнятий, спробуйте інший!'});
                     return;
                 }
 
                 if (userByEmail !== null) {
-                    res.status(400).send({msg: 'Почта занята, попробуйте другую'});
+                    res.status(400).send({msg: 'Пошта зайнята, спробуйте іншу!'});
                     return;
                 }
 
@@ -89,13 +89,13 @@ module.exports = function () {
                 });
 
                 await sendEmail({
-                    from: 'antsiferovmaximv@gmail.com',
+                    from: 'podarui.nastrii@gmail.com',
                     to: req.body.email,
-                    subject: 'Код активации',
-                    text: `Чтобы активировать аккаунт перейдите по ссылке - ${FRONT_HOST}api/activate/${activationToken}`
+                    subject: 'Код активації',
+                    text: `Щоб активувати обліковий запис перейдіть за посиланням - ${FRONT_HOST}api/activate/${activationToken}`
                 });
 
-                res.status(201).send({msg: 'Аккаунт создан, теперь можете войти'});
+                res.status(201).send({msg: 'Аккаунт створений, тепер можете увійти!'});
             } catch (e) {
                 console.log(e);
 
@@ -112,7 +112,7 @@ module.exports = function () {
             const currentEmail = await ForgotCodeModel.findOne({email, code});
 
             if (!currentEmail)
-                return res.status(404).send({msg: `Не верный код`});
+                return res.status(404).send({msg: `Невірний код`});
 
             await ForgotCodeModel.deleteOne({email, code});
 
@@ -127,7 +127,7 @@ module.exports = function () {
             });
 
             return res.send({
-                msg: 'Пароль восстановлен'
+                msg: 'Пароль відновлений'
             })
         })
         .post('/forgot', async function (req, res) {
@@ -141,14 +141,14 @@ module.exports = function () {
             });
 
             await sendEmail({
-                from: 'antsiferovmaximv@gmail.com',
+                from: 'podarui.nastrii@gmail.com',
                 to: email,
-                subject: 'Восстановление пароля',
-                text: `Код для восстановления пароля - ${code}.`
+                subject: 'Відновлення пароля',
+                text: `Код для відновлення пароля - ${code}.`
             });
 
             res.status(201).send({
-                msg: 'Код отправлен на почту'
+                msg: 'Код відправлений на пошту!'
             })
         })
         .get('/activate/:token', async function (req, res) {
@@ -159,7 +159,7 @@ module.exports = function () {
 
                 res.redirect(301, `http://${host}${frontPort}/`);
             } else {
-                res.send('Код не найден');
+                res.send('Код не знайдений!');
             }
         })
     ;
