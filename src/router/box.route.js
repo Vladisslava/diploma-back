@@ -218,12 +218,18 @@ module.exports = function () {
             const box = await Box.findById(req.params.id);
 
             if (!box) {
-                return res.status(404).send({error: true, message: 'Коробка не найдена'})
+                return res.status(404).send({error: true, msg: 'Коробка не найдена'})
             }
 
-            const updatedBox = await Box.findByIdAndUpdate(req.params.id, {$set: req.body}, {new: false});
+            await Box.findByIdAndUpdate(req.params.id, {$set: req.body}, {new: false});
+            const updatedBox = await Box.findById(req.params.id);
 
             res.send(updatedBox);
+        })
+        .delete('/box/:id', async function (req, res) {
+            await Box.findByIdAndRemove(req.params.id);
+
+            res.send({msg: 'Коробка удалена'})
         })
         .post('/box', async function (req, res) {
             try {
@@ -235,18 +241,12 @@ module.exports = function () {
                     res.status(500).send({msg: 'Ошибка'});
                 }
 
-                console.log(req.body);
-
                 const box = await Box.create({...req.body});
 
                 res.status(201).send({msg: 'Коробка создана', box});
             } catch (e) {
-                console.log(e);
-
                 res.status(500).send({msg: 'Коробка не создана'});
             }
-
-            res.send('sdas');
         })
         .post('/box/join', async function (req, res) {
             const {userId, boxId, password} = req.body;
