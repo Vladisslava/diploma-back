@@ -92,7 +92,7 @@ module.exports = function () {
                     from: 'podarui.nastrii@gmail.com',
                     to: req.body.email,
                     subject: 'Код активації',
-                    text: `Щоб активувати обліковий запис перейдіть за посиланням - ${FRONT_HOST}api/activate/${activationToken}`
+                    text: `Щоб активувати обліковий запис перейдіть за посиланням - ${FRONT_HOST}/api/activate/${activationToken}`
                 });
 
                 res.status(201).send({msg: 'Аккаунт створений, тепер можете увійти!'});
