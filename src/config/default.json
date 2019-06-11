@@ -2,7 +2,7 @@
   "api": {
     "port": 8080
   },
-  "front": "http://localhost:3000",
+  "front": "https://vladisslava.githuc.com",
   "https": {
     "key": "/opt/certs/31.131.28.162.key",
     "cert": "/opt/certs/31.131.28.162.crt"
