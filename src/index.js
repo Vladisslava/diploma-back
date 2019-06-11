@@ -1,6 +1,8 @@
 const path = require('path');
 const express = require('express');
 const request = require('request');
+const https = require('https');
+const fs = require('fs');
 const config = require('./config/default');
 const bodyParser = require('body-parser');
 const passport = require('./auth/passport');
@@ -128,8 +130,16 @@ api
     .use('/', routes);
 
 setTimeout(() => {
-    api.listen(port, () => {
+    https.createServer({
+        key: fs.readFileSync(config.https.key),
+        cert: fs.readFileSync(config.https.cert),
+    }, api)
+        .listen(port);
+    console.log('Api starting in https://localhost:' + port);
+
+
+    /*api.listen(port, () => {
         console.log('Api starting in http://localhost:' + port);
-    });
+    });*/
 }, 2000);
 
