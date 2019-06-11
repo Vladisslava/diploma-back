@@ -130,16 +130,16 @@ api
     .use('/', routes);
 
 setTimeout(() => {
-    https.createServer({
+    /*https.createServer({
         key: fs.readFileSync(config.https.key),
         cert: fs.readFileSync(config.https.cert),
     }, api)
         .listen(port);
-    console.log('Api starting in https://localhost:' + port);
+    console.log('Api starting in https://localhost:' + port);*/
 
 
-    /*api.listen(port, () => {
+    api.listen(port, () => {
         console.log('Api starting in http://localhost:' + port);
-    });*/
+    });
 }, 2000);
 

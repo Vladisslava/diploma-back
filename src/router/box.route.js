@@ -214,6 +214,17 @@ module.exports = function () {
 
             return res.send('ok')
         })
+        .put('/box/:id', async function (req, res) {
+            const box = await Box.findById(req.params.id);
+
+            if (!box) {
+                return res.status(404).send({error: true, message: 'Коробка не найдена'})
+            }
+
+            const updatedBox = await Box.findByIdAndUpdate(req.params.id, {$set: req.body}, {new: false});
+
+            res.send(updatedBox);
+        })
         .post('/box', async function (req, res) {
             try {
                 if (!req.body.name) {
