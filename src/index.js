@@ -93,7 +93,7 @@ const getISONow = () => moment().startOf('day').subtract(timezoneOffset(), 'h').
                 from: 'antsiferovmaximv@gmail.com',
                 to: user.email,
                 subject: `Сегодня произошло распределения подарков в коробке <${box.name}>`,
-                text: `Можете перейти в коробку, чтобы узнать подопечного ${FRONT_HOST}home/boxperson/${box._id}`
+                text: `Можете перейти в коробку, чтобы узнать подопечного ${FRONT_HOST}/home/boxperson/${box._id}`
             });
 
             prevUser = userInBox.user
