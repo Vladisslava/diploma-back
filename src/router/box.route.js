@@ -4,6 +4,12 @@ const User = require('../database/models/user.model');
 const request = require('request');
 const {sendEmail} = require('../service/mailer');
 const config = require('../config/default');
+const CronJob = require('cron').CronJob;
+const moment = require('moment');
+const FCM = require('fcm-node');
+
+const serverKey = 'AAAADRbQi1U:APA91bE1KgPbWdH-DBee1rgXf6e2-IvvmQJ1SrSIZa9FBKyO_smZPWdvEgel10VLZsi4e4jDk4_QsY_iwEXRKC1I8zr1pPmN_VsyaZ9M4KJ7D4wYtnFkUrkO5J7CIIJR8pTOEtc3Df0j';
+const fcm = new FCM(serverKey);
 
 const keys = [
     'username',
@@ -13,6 +19,7 @@ const keys = [
     'gender',
     'yearOfBirth',
     'phone',
+    'photo',
     'country',
     'city',
     'address',
@@ -77,37 +84,30 @@ async function distributionInBox(box) {
             ward: prevUser
         };
 
+        console.log(newUser);
+
         newUsers.push(newUser);
 
         const user = await User.findById(userInBox.user);
 
         if (user.messageToken) {
-            request({
-                method: 'POST',
-                uri: 'https://fcm.googleapis.com',
-                headers: {
-                    Authorization: 'key=AAAADRbQi1U:APA91bE1KgPbWdH-DBee1rgXf6e2-IvvmQJ1SrSIZa9FBKyO_smZPWdvEgel10VLZsi4e4jDk4_QsY_iwEXRKC1I8zr1pPmN_VsyaZ9M4KJ7D4wYtnFkUrkO5J7CIIJR8pTOEtc3Df0j'
+            const message = { //this may vary according to the message type (single recipient, multicast, topic, et cetera)
+                to: user.messageToken,
+
+                notification: {
+                    title: 'Подаруй',
+                    body: 'Сьогодні відбувся розподіл участників у події<${box.name}>'
                 },
-                postData: {
-                    mimeType: 'application/json',
-                    params: {
-                        "notification": {
-                            "title": "Подаруй",
-                            "body": "Розподіл відбувся!",
-                            "icon": "https://eralash.ru.rsz.io/sites/all/themes/eralash_v5/logo.png?width=40&height=40",
-                            "click_action": config.front
-                        },
-                        "to": user.messageToken
-                    }
-                }
-            });
+            };
+
+            fcm.send(message);
         }
 
         sendEmail({
             from: 'podarui.nastrii@gmail.com',
             to: user.email,
             subject: `Сьогодні відбувся розподіл участників у події<${box.name}>`,
-            text: `Можете перейти у подію, щоб дізнатися дані отриманого участника ${FRONT_HOST}/home/boxperson/${box._id}`
+            text: `Можете перейти у подію, щоб дізнатися дані отриманого участника ${config.front}/#/home/boxperson/${box._id}`
         });
 
         prevUser = userInBox.user
@@ -115,6 +115,14 @@ async function distributionInBox(box) {
 
     await Box.findOneAndUpdate({_id: box._id}, {$set: {users: newUsers}}, {new: false});
 }
+
+new CronJob('0 0 8 * * *', async function() {
+    const data = await Box.find({dateDistribution: getISONow()});
+
+    for (let box of data) {
+        await distributionInBox(box)
+    }
+}, null, true, 'UTC');
 
 module.exports = function () {
     return router
@@ -125,7 +133,13 @@ module.exports = function () {
                 {
                     name: new RegExp(query, 'i')
                 },
-                {page, limit: 6}
+                {
+                    sort: {
+                        dateEnd: 'desc'
+                    },
+                    page,
+                    limit: 6,
+                }
             );
 
             res.send(boxes);
@@ -156,7 +170,13 @@ module.exports = function () {
             res.send({msg: '', box});
         })
         .get('/box/all/:page', async function (req, res) {
-            const boxes = await Box.paginate({}, {page: req.params.page, limit: 6});
+            const boxes = await Box.paginate({}, {
+                sort: {
+                    dateEnd: 'desc'
+                },
+                page: req.params.page,
+                limit: 6
+            });
 
             res.send({msg: '', boxes})
         })
