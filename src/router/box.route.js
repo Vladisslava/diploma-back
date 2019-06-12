@@ -76,6 +76,10 @@ async function distributionInBox(box) {
     const shuffleUsers = shuffle(box.users);
     let prevUser = shuffleUsers[shuffleUsers.length - 1].user;
 
+    if (shuffleUsers[shuffleUsers.length - 1].ward !== null) {
+        return;
+    }
+
     for (let i = 0; i < shuffleUsers.length; i++) {
         const userInBox = shuffleUsers[i];
         const newUser = {
@@ -83,8 +87,6 @@ async function distributionInBox(box) {
             user: userInBox.user,
             ward: prevUser
         };
-
-        console.log(newUser);
 
         newUsers.push(newUser);
 
@@ -116,13 +118,15 @@ async function distributionInBox(box) {
     await Box.findOneAndUpdate({_id: box._id}, {$set: {users: newUsers}}, {new: false});
 }
 
-new CronJob('0 0 8 * * *', async function() {
+const job = new CronJob('00 00 08 * * *', async function() {
     const data = await Box.find({dateDistribution: getISONow()});
 
     for (let box of data) {
         await distributionInBox(box)
     }
 }, null, true, 'UTC');
+
+job.start();
 
 module.exports = function () {
     return router
