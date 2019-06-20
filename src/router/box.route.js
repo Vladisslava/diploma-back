@@ -1,7 +1,6 @@
 const router = require('express').Router();
 const Box = require('../database/models/box.model');
 const User = require('../database/models/user.model');
-const request = require('request');
 const {sendEmail} = require('../service/mailer');
 const config = require('../config/default');
 const CronJob = require('cron').CronJob;
@@ -38,6 +37,7 @@ function includesUser(users, id) {
     return false;
 }
 
+// Копирование в новый объект только нужные значения из старого объекта
 function copyObject(obj, keys) {
     const newObject = {};
 
@@ -48,6 +48,7 @@ function copyObject(obj, keys) {
     return newObject;
 }
 
+// Функция для перемешивания массива
 function shuffle(array) {
     let currentIndex = array.length, temporaryValue, randomIndex;
 
@@ -63,23 +64,32 @@ function shuffle(array) {
     return array;
 }
 
+// Получение временного пояса
 function timezoneOffset() {
     return new Date().getTimezoneOffset() / 60
 }
 
+// Функция для получения сегодняшней даты в виде 2019-06-07T00:00:00.000Z
 const getISONow = () => moment().startOf('day').subtract(timezoneOffset(), 'h').toISOString();
 
+// Фунция для распределения пользователей в коробке
 async function distributionInBox(box) {
+    // Если в коробке нет пользователей, то выходим из фунции
     if (box.users.length === 0) return;
 
+    // Тут определеяется было ли распределение, если у последнего пользователя есть подопечный, то значит распределение было и выходим из функции
+    if (box.users[box.users.length - 1].ward !== null)
+        return;
+
+    // Пустой массив для хранения распределенных пользователей
     const newUsers = [];
+    // Перемешиваем массив с существуюшими пользователями
     const shuffleUsers = shuffle(box.users);
+
+    // Берем последнего пользователя и потом присвоим его как подопечного первому пользоватлю
     let prevUser = shuffleUsers[shuffleUsers.length - 1].user;
 
-    if (shuffleUsers[shuffleUsers.length - 1].ward !== null) {
-        return;
-    }
-
+    // Тут в цикле перебираем пользователей и каждому присваиваем в качестве подопечного предыдущего
     for (let i = 0; i < shuffleUsers.length; i++) {
         const userInBox = shuffleUsers[i];
         const newUser = {
@@ -88,23 +98,28 @@ async function distributionInBox(box) {
             ward: prevUser
         };
 
+        // Добавляем распределенного пользователя в новый массива
         newUsers.push(newUser);
 
+        // Достаем пользователя из базы данных
         const user = await User.findById(userInBox.user);
 
+        // Проверяем есть ли у него токен для получения web push notifications
         if (user.messageToken) {
             const message = { //this may vary according to the message type (single recipient, multicast, topic, et cetera)
                 to: user.messageToken,
 
                 notification: {
                     title: 'Подаруй',
-                    body: 'Сьогодні відбувся розподіл участників у події<${box.name}>'
+                    body: `Сьогодні відбувся розподіл участників у події<${box.name}>`
                 },
             };
 
+            // Отправляем уведосление
             fcm.send(message);
         }
 
+        // Отправляем уведосление на почту
         sendEmail({
             from: 'podarui.nastrii@gmail.com',
             to: user.email,
@@ -112,12 +127,15 @@ async function distributionInBox(box) {
             text: `Можете перейти у подію, щоб дізнатися дані отриманого участника ${config.front}/#/home/boxperson/${box._id}`
         });
 
+        // Присваиваем текущего пользователя в переменную с предыдущим
         prevUser = userInBox.user
     }
 
+    // Сохранаем в базе список распределенных пользователей
     await Box.findOneAndUpdate({_id: box._id}, {$set: {users: newUsers}}, {new: false});
 }
 
+// С помощью CronJob создает функцию, которая будет выполняться каждый день в 8 утра
 const job = new CronJob('00 00 08 * * *', async function() {
     const data = await Box.find({dateDistribution: getISONow()});
 
@@ -126,6 +144,7 @@ const job = new CronJob('00 00 08 * * *', async function() {
     }
 }, null, true, 'UTC');
 
+// Запускаем эту функцию
 job.start();
 
 module.exports = function () {
