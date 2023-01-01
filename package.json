@@ -14,7 +14,7 @@
   "dependencies": {
     "axios": "^0.19.0",
     "body-parser": "^1.18.2",
-    "config": "^1.29.4",
+    "config": "^3.3.8",
     "cors": "^2.8.4",
     "cron": "^1.7.1",
     "crypto": "^1.0.1",
